@@ -1,26 +1,42 @@
+import subprocess
+
+subprocess.run(["pip", "install", "transformers"])
+subprocess.run(["pip", "install", "torch"])
+
 import time
 import pandas as pd
 from PIL import Image
+
+import os
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import streamlit as st
 import torch
 
-# Initialize the tokenizer and model
-tokenizer = AutoTokenizer.from_pretrained("Afia-manubea/FineTuned-DistilBert-Model")
-model = AutoModelForSequenceClassification.from_pretrained("Afia-manubea/FineTuned-DistilBert-Model")
+# Define model paths
+model_paths = {
+    "Model 1-DistilBert": "Afia-manubea/FineTuned-DistilBert-Model",
+    "Model 2-BertTweet": "Afia-manubea/FineTuned-BertTweet-Classification-Model"
+}
+
+
+
 
 def main():
     # Setup web page
     st.set_page_config(
+        page_title="Covid Vaccine tweets Sentiment",
+        layout="wide",
+        menu_items={
+            'About': "The source code for this application can be accessed on GitHub "
+        }
+    )
 
-     page_title="Covid Vaccine tweets Sentiment",
-     #page_icon=('nav_pg.jpg'),
-     layout="wide",
-     menu_items={
-         'About': "The source code for this application can be accessed on GitHub "
-     }
-)
+    # Initialize the tokenizer and model
+    selected_model = st.sidebar.selectbox("Select Model", list(model_paths.keys()))
+    tokenizer = AutoTokenizer.from_pretrained(model_paths[selected_model])
+    model = AutoModelForSequenceClassification.from_pretrained(model_paths[selected_model])
+
     st.markdown("""
     <style type="text/css">
     blockquote {
@@ -61,7 +77,7 @@ def main():
         home()
 
     elif page == 'Predict':
-        predict_sentiment()
+        predict_sentiment(tokenizer,model)
 
     elif page == 'About':
         about_info()
@@ -75,8 +91,15 @@ def home():
     st.markdown("## FINETUNED BERT SENTIMENT MODEL FOR CATEGORIZATION OF COVID TWEETS")
 
      # Open and display the image
-    img = Image.open('pics\emotional-feedback-concept-illustration (3).zip (Unzipped Files)\9019830.jpg')
-    st.image(img)
+    #img = Image.open('Covid-Tweets-Sentiment-Streamlit-App/p5/Covid-Tweets-Sentiment-Streamlit-App/pics/9019830.jpg')
+    #st.image(img)
+
+    # Specify the GitHub URL for the image
+    image_url = 'https://huggingface.co/spaces/Afia-manubea/Covid-Tweets-Sentiment-Streamlit-App/raw/main/p5/Covid-Tweets-Sentiment-Streamlit-App/pics/9019830.jpg'
+
+    # Display the image in Streamlit
+    st.image(image_url, caption="Your Image Caption", use_column_width=True)
+
 
     st.write("""
      ### To ensure the best of **Experience** on the covid tweet sentiment App ,
@@ -87,7 +110,7 @@ def home():
     """)
 
 
-def predict_sentiment():
+def predict_sentiment(tokenizer,model):
     st.title("Classify Sentiment")
 
     # Add an information message
@@ -142,8 +165,13 @@ def about_info():
     st.title("About")
 
      # Open and display the image
-    img = Image.open('pics\emotional-feedback-concept-illustration (1).zip (Unzipped Files)\8447107.jpg')
-    st.image(img)
+    #img = Image.open(r'Covid-Tweets-Sentiment-Streamlit-App\pics\8447107.jpg')
+    #st.image(img)
+    
+    # Specify the GitHub URL for the image
+    image_url = 'https://huggingface.co/spaces/Afia-manubea/Covid-Tweets-Sentiment-Streamlit-App/raw/main/p5/Covid-Tweets-Sentiment-Streamlit-App/pics/8447107.jpg'
+    # Display the image in Streamlit
+    st.image(image_url, caption="Your Image Caption", use_column_width=True)
 
     st.write("""
     Welcome to our Streamlit app! We are dedicated to providing a powerful solution that aims to help governments and public health actors monitor public sentiment towards COVID-19 vaccinations.
@@ -157,7 +185,7 @@ def about_info():
     insights into public perception, concerns, and attitudes.
 
     Developed by Team Charleston.
-    More details about the project and methodology can be found [here](your_link).
+    More details about the project and methodology can be found [here](https://github.com/florenceaffoh/P5-Sentiment-Analysis.git).
     """)
 
 
